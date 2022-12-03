@@ -1,0 +1,24 @@
+Holy spoons	Never before has your silver been this close to god!	CBOT	XCBT	5000	bu	USD ($)	Inquisitive minding	holy-spoons.svg
+Insect bones	"Insects have bones too, you know. Just because they don't doesn't mean they don't."	CBOT	XCBT	5000	bu	USD ($)	Inquisitive minding	insect-bones.svg
+Fall leaves	"Ah, who wants dead leaves on the ground these days? You do, that's who!"	CBOT	XCBT	2000	cwt	USD ($)	Inquisitive minding	fall-leaves.svg
+Emerald dust	"They always leave the emerald dust on the floor to be swept into a bin. We say, give us that emerald dust and we'll make an emerald dust ball!"	CBOT	XCBT	5000	bu	USD ($)	Inquisitive minding	emerald-dust.svg
+Wicked thoughts	Most people have em. Now you can buy em.	ICE	IEPA	10000	kg	USD ($)	Whispers of magnetism	wicked-thoughts.svg
+Failed popcorn	"You know the ones, at the bottom of the sack. They haven't popped at all or are in some horrific gestational transition, frozen for all time."	CME	null	40000	lb	USD ($)	Whispers of magnetism	failed-popcorn.svg
+Soda fizz	What happens when you let the fizz out? We collect it and sell it to those who know best.	CME	null	40000	lb	USD ($)	Whispers of magnetism	soda-fizz.svg
+Oxford commas	"Who gives an f about an oxford comma? You do, that's who."	CME	null	50000	lb	USD ($)	Whispers of magnetism	oxford-commas.svg
+Origami folds	Origami is nothing without the folds.	NYMEX	null	1000	bbl	USD ($)	Crazy capacious capers	origami-folds.svg
+Orange tangents	These juicy by-products of proximity are just the ticket for metaphysical orange juice.	ICE	null	1000	bbl	USD ($)	Crazy capacious capers	orange-tangents.svg
+Chunky boogers	"Honestly though, are you gonna buy goopy boogers instead?"	CBOT	null	29000	gal	USD ($)	Crazy capacious capers	chunky-boogers.svg
+Potato eyes	"Potato eyes, are watching you, they see your every move."	NYMEX	null	10000	mil btu	USD ($)	Crazy capacious capers	potato-eyes.svg
+Very loud moos	"MOOO, MOOO, MOOOO, MOOOOO, and MOOOO (yes we paid for that comma)."	NYMEX	null	1000	bbl	USD ($)	Crazy capacious capers	very-loud-moos.svg
+Creepy smiles	"Clowns are only creepy when they smile. Well, no, but they are extra creepy when they do!"	NYMEX	null	1000	bbl	USD ($)	Crazy capacious capers	creepy-smiles.svg
+Codswallop	"BS, horse manure, piles of lies, balderdash, half-truths, deception, there's more where they come from."	CME	null	20	tons	USD ($)	Pixie Dust	codswallup.svg
+Burning stars	"Stars have feelings. They don't like to burn out, just up."	CME	null	20	tons	USD ($)	Pixie Dust	burning-stars.svg
+Fir fantasies	"If only I could sing and dance and be a decid... no no, stop the music."	LME	null	1	tons	USD ($)	Sins of the forest	fir-fantasies.svg
+Koala needs	"Bamboo, unicorn fur, groucho marx smiles, and a good tree to hug."	LME	null	1	tons	USD ($)	Sins of the forest	koala-needs.svg
+Mysterious mojo	"It makes you tick, but you don't, and we don't know how or why."	LME	null	1	tons	USD ($)	Sins of the forest	mysterious-mojo.svg
+Doo dahs	Every zippity is lost without one. And there are a lot of zippities out there.	LME	null	1	tons	USD ($)	Sins of the forest	doo-dahs.svg
+TPS reports	I'm gonna have to ask you to fill out some more TPS reports.	LME	null	1	tons	USD ($)	Sins of the forest	tps-reports.svg
+Syrup holes	"Syrup doesn't come from trees, nor from spigots. It comes from holes in the trees. Without those - no waffles."	NYMEX	null	50	troy ounces	USD ($)	Many returns	syrup-holes.svg
+Limes of destiny	"Buy these, and they will be now, forever, and in the future. Even when they rot."	NYMEX	null	100	troy ounces	USD ($)	Many returns	limes-of-destiny.svg
+Striped pins	"So cute, so versatile, so yours for the right price."	COMEX	null	5000	troy ounces	USD ($)	Many returns	striped-pins.svg

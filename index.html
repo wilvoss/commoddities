@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html itemtype="http://schema.org/VideoGame" lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta content="x-content-type-options=nosniff" />
+
+    <title>CommOddities!</title>
+
+    <meta name="apple-mobile-web-app-title" content="CommOddities!" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000">
+
+    <meta name="keywords" content="CommOddities!, Commodities, Games, Free, FullyFree" />
+    <meta name="description" content="Buy, sell, embrace or avoid corruption!" />
+
+    <meta name="twitter:card" content="summary_large_image">
+    </meta>
+    <meta property="og:title" content="CommOddities!" />
+    <meta property="og:site_name" content="CommOddities!" />
+    <meta property="og:description" content="Buy, sell, embrace or avoid corruption!" />
+    <meta property="og:type" content="photo" />
+    <meta property="og:url" content="https://commoddities.games" />
+    <meta property="og:image" content="https://commoddities.games/images/commoddities_og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <link id="appleicon" rel="apple-touch-icon" sizes="180x180" href="/images/icon180.png">
+    <!-- iPhone X (1125px x 2436px) -->
+    <link rel="apple-touch-startup-image"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+      href="images/apple-launch-1125x2436.png">
+    <!-- iPhone 8, 7, 6s, 6 (750px x 1334px) -->
+    <link rel="apple-touch-startup-image"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+      href="images//apple-launch-750x1334.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+
+    <link rel="manifest" href="manifest.webmanifest">
+
+    <link rel="stylesheet" href="styles/commodities.css" media="screen" />
+    <link rel="stylesheet" id="theLightness" href="" media="screen" />
+    <script src="helpers/console-enhancer.js" type='text/javascript'></script>
+    <script type="text/javascript">
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js');
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <app id="app"
+      :class="[{highlight: showTutorial, gameover: timeToEnd == 0 || gameOver, paused: gamePaused, showDetails: selectedCommodity != null, showSettings: showSettings, showHowTo: showHowTo}, currentTutorial.class]">
+
+      <audio id="themeMusic" loop>
+        <source src="" id="themeSource" type="audio/aac">
+      </audio>
+      <splash :class="{loaded: gameLoaded}" v-cloak>
+        <splashwrap v-cloak>
+          <logo @click="window.open('https://bigtentgames.com', '_blank')">
+          </logo>
+          <h1 v-cloak>CommOddities!</h1>
+          <tagline v-cloak>A game of odds.</tagline>
+          <p v-cloak><b>Start with {{Currency(startingBank)}} in the bank.</b></p>
+          <p v-cloak>How much can you earn in 365 turns?</p>
+          <button @click="StartOver" class="secondary" v-cloak>Play</button>
+          <button @click="showSettings = true; showHowTo = false;" v-cloak>Settings</button>
+          <button @click="StartTutorial" v-cloak>How to play</button>
+        </splashwrap>
+      </splash>
+      <notifications
+        :class="{open: showNotification, serious: currentNotification!=null && currentNotification.type == 'serious', warn: currentNotification!=null && currentNotification.type == 'warn'}"
+        v-cloak>
+        <message v-if="currentNotification != null">
+          <h3>{{currentNotification.title}}</h3>
+          <p v-if="currentNotification.subtitle != ''">{{currentNotification.subtitle}}</p>
+          <button class="secondary"
+            @click="currentNotification.button1CallBack">{{currentNotification.button1Text}}</button>
+          <button v-if="currentNotification.button2Text != ''"
+            @click="currentNotification.button2CallBack">{{currentNotification.button2Text}}</button>
+        </message>
+      </notifications>
+      <info v-cloak>
+        <bank :class="{added: bankFundsAdded}">
+          <span @click="showSettings = !showSettings">{{Currency(currentBank)}}</span>
+          <p class="settingsButton">
+            <settingsButton>{{this.timeToEnd}} days left</settingsButton>
+          </p>
+        </bank>
+        <speedControls>
+          <button class="pause" @click="ToggleGamePaused(!gamePaused)">
+            <span>{{gamePaused ? '❚❚ Paused' : '▶&#xFE0E; Playing'}} </span>
+          </button>
+          <button class="speed"
+            @click="ToggleGameSpeed">{{gameSpeed == 1000 ? '10x speed' : gameSpeed == 10000 ? '1x speed': '5x speed'}}</button>
+          <button v-if="timeToEnd != 0 && !gameOver" class="quit" @click="HandleQuitGameCall">Quit</button>
+        </speedControls>
+        <subhead v-if="timeToEnd != 0 && !gameOver">Current value</subhead>
+        <networth @click="SelectCommodity(event, selectedCommodity); showSettings = false">
+          {{gameOver ? 'Game over' : Currency(totalValue)}}
+        </networth>
+      </info>
+      <listheader :class="{hide: !pages[0].isSelected}" v-cloak>
+        <goldbacking>
+          <name @click="sortByPrice = false; sortByValue = false; sortByWatched = false;"
+            :class="{sortedBy: !sortByPrice && !sortByValue && !sortByWatched}">
+            Rarity</name>
+          <currentPrice @click="sortByPrice = true; sortByValue = false;sortByWatched = false;"
+            :class="{sortedBy: sortByPrice}">Price
+          </currentPrice>
+          <units @click="sortByPrice = false; sortByValue = true; sortByWatched = false;"
+            :class="{sortedBy: sortByValue}">Owned
+          </units>
+          <watched @click="sortByPrice = false; sortByValue = false; sortByWatched = true;"
+            :class="{sortedBy: sortByWatched}">Watch
+          </watched>
+
+        </goldbacking>
+      </listheader>
+      <listings :class="{showColor: showColor, hide: !pages[0].isSelected}" v-cloak>
+        <commodity class="noneOwned" v-show="sortByValue && totalValue <= 0 && !hasLostAlls">
+          <goldbacking>
+            <!-- <img src="images/big tent logo.svg" alt='' /> -->
+            <p>You don't own any oddities!</p>
+            <button class="secondary" @click="sortByPrice = false; sortByValue = false; sortByWatched = false">Show
+              Oddities</button>
+          </goldbacking>
+        </commodity>
+
+        <commodity @click="SelectCommodity(event, row)" :key="row.key"
+          v-if="sortByPrice && !row.isHeader  || sortByValue && row.unitsOwned > 0  || row.lostAll && sortByValue || row.isWatched && sortByWatched || !sortByValue && !sortByPrice && !sortByWatched"
+          v-for="row in sortByPrice ? commoditiesByPrice : sortByValue ? commoditiesByPrice : sortByWatched ? commoditiesByPrice :commoditiesByName"
+          :class="{justChanged: row.justChanged,unitsOwned: row.unitsOwned > 0, selected: row.isSelected, categoryHeader: row.isHeader, up: Number(row.previousPrice.value)<Number(row.currentPrice.value), down: Number(row.previousPrice.value)>Number(row.currentPrice.value)}">
+          <goldbacking>
+            <history>
+              <bar v-if="index > row.priceHistory.length - sparklineLength" v-for="(price, index) in row.priceHistory"
+                :title="Currency(price.value)"
+                :class="{purchased: price.isPurchasePrice, sold: price.isSellPrice, short: price.value/row.highestOutOfLastSet < .1}"
+                :style="{opacity: 1 - Number(row.priceHistory.length - index) / 10, 
+                  height: Math.round(100 * (price.value/row.highestOutOfLastSet < .05 ? .05 : price.value/row.highestOutOfLastSet)) + '%', 
+                  transform:  'translateY(' + (price.value/row.highestOutOfLastSet < .05 ? 19 : (20 - Math.round(20 * price.value/row.highestOutOfLastSet))) + 'px)'}">
+              </bar>
+            </history>
+            <img :src="'images/commodities/' + row.imageUrl" alt='' />
+            <category v-if="row.isHeader">{{row.category}}</category>
+            <name>{{row.name}}</name>
+            <currentPrice>{{Currency(row.currentPrice.value)}}
+            </currentPrice>
+            <units>
+              {{Number(row.unitsOwned) > 0 ? 'x ' + FormatAsNumber(row.unitsOwned) : ''}}
+            </units>
+          </goldbacking>
+        </commodity>
+
+        <commodity v-if="sortByWatched && watchedItemCount==0" class="watched">
+          <goldbacking>
+            <!-- <img src="images/big tent logo.svg" alt='' /> -->
+            <p>Oddities marked as watched are shown here. </p>
+            <button class="secondary" @click="sortByPrice = false; sortByValue = false; sortByWatched = false">Show
+              Oddities</button>
+          </goldbacking>
+        </commodity>
+
+      </listings>
+      <page :class="{hide: !pages[1].isSelected}" v-cloak>
+        <pagewrap>
+          <h1>Quest</h1>
+          <p>Own 100 units in each of these commoddities at the same time and receive $20,000!</p>
+          <commodity @click="SelectGiftedCommodity(event, row)" v-for="row in giftList"
+            :class="{gifted: row.giftFulfilled}">
+            <goldbacking>
+              <img :src="'images/commodities/' + row.imageUrl" alt='' />
+              <p>{{row.name}}</p>
+            </goldbacking>
+          </commodity>
+        </pagewrap>
+      </page>
+      <page :class="{hide: !pages[2].isSelected}" v-cloak>
+        <pagewrap>
+          <h1>Log</h1>
+        </pagewrap>
+      </page>
+      <detail v-cloak v-if="displayedCommodity != null" :class="{hasImage: displayedCommodity.imageUrl != ' '}">
+        <navcontrols>
+          <button aria-label="Close" class="close" @click="SelectCommodity(event, selectedCommodity)"></button>
+        </navcontrols>
+        <h1>{{displayedCommodity.name}}</h1>
+        <img :src="'images/commodities/' + displayedCommodity.imageUrl" alt=''
+          v-if="displayedCommodity != null && displayedCommodity.imageUrl != 'null'" />
+        <h2 v-if="displayedCommodity.currentPrice.value > 0">
+          {{Currency(displayedCommodity.currentPrice.value)}}
+        </h2>
+        <h2 v-if="displayedCommodity.currentPrice.value <= 0">Currently not available.
+        </h2>
+        <h3>You own {{FormatAsNumber(displayedCommodity.unitsOwned)}} units.
+        </h3>
+        <button aria-label="Sell All" class="secondary first" v-if="displayedCommodity.unitsOwned > 0"
+          @click="SellNumberOfUnits(displayedCommodity, 'full')">Sell all for
+          {{(Currency(displayedCommodity.currentValue))}}</button>
+        <button aria-label="Sell Half" class="secondary" v-if="displayedCommodity.unitsOwned > 0"
+          @click="SellNumberOfUnits(displayedCommodity, 'half')">Sell half for
+          {{(Currency(Math.round(displayedCommodity.unitsOwned / 2) * displayedCommodity.currentPrice.value))}}</button>
+        <button aria-label="Buy All" style="margin-top: calc(var(--gridSize) * 2)"
+          v-if="displayedCommodity.unitsOwned == 0 && displayedCommodity.currentPrice.value > 0"
+          :class="{disabled: currentBank - Number((currentBank ) % displayedCommodity.currentPrice.value) == 0 || currentBank <= 0}"
+          @click="BuyCommodity">
+          {{ currentBank - Number((currentBank ) % displayedCommodity.currentPrice.value) == 0 || currentBank <= 0 ? 'Not enough funds' : 'Buy ' + FormatAsNumber(Math.round(MathTheFee('')/displayedCommodity.currentPrice.value)) + ' for ' + Currency(MathTheFee(''))}}
+        </button>
+        <button aria-label="Buy Half" @click="BuyCommodity('half')"
+          v-if="displayedCommodity.unitsOwned == 0 && displayedCommodity.currentPrice.value > 0"
+          :class="{disabled: currentBank / 2 - Number((currentBank / 2) % displayedCommodity.currentPrice.value) == 0 || currentBank <= 0}">
+          {{ currentBank / 2 - Number((currentBank / 2) % displayedCommodity.currentPrice.value) == 0 || currentBank <= 0 ? 'Not enough funds' : 'Buy ' + FormatAsNumber(Math.round(MathTheFee('half')/displayedCommodity.currentPrice.value)) + ' for ' + Currency(MathTheFee('half'))}}
+        </button>
+        <button @click="ToggleItemAsWatched(displayedCommodity)"
+          :class="{secondary: displayedCommodity.isWatched}">{{displayedCommodity.isWatched ? 'Remove from watched' : 'Add to watch'}}</button>
+        <description>{{displayedCommodity.description}}</description>
+        <description><i>All purchases are subject to a $.01 fee per unit bought.</i></description>
+        <axis>Highest price: {{Currency(displayedCommodity.highestPrice.value)}}</axis>
+        <history>
+          <bar v-for="(price, index) in priceHistoryInReverse" :title="price.value"
+            :class="{purchased: price.isPurchasePrice, sold: price.isSellPrice}"
+            :style="{height: 100 * price.value/displayedCommodity.highestPrice.value + '%', marginTop:  100 - (100 * price.value/displayedCommodity.highestPrice.value) + 'px'}">
+          </bar>
+        </history>
+        <axis></axis>
+        <axisclear></axisclear>
+        <button aria-label="Remove from owned view" style="width: 100%;" v-if="displayedCommodity.lostAll"
+          @click="displayedCommodity.lostAll = false; SelectCommodity(event, selectedCommodity)">Remove from "Owned"
+          view</button>
+        <p style="height: 40px;"></p>
+      </detail>
+      <gameover v-cloak>
+        <p>You now have</p>
+        <h1>{{Currency(totalValue + currentBank)}}!</h1>
+        <p v-if="timeToEnd > 0 ">You can't buy anything else :(</p>
+        <p v-if="timeToEnd == 0 ">A year of trading has passed :)</p>
+        <h2 v-if="currentBank + totalValue - 10 < 0">Pretty bad, better luck next time!</h2>
+        <h2 v-if="currentBank + totalValue - 10 >= 0 && currentBank + totalValue - 10 < 100">Not bad, could be better.
+        </h2>
+        <h2 v-if="currentBank + totalValue - 10 >= 100 && currentBank + totalValue - 10 < 1000">Pretty good, you're
+          getting the hang of it.</h2>
+        <h2 v-if="currentBank + totalValue - 10 >= 1000 && currentBank + totalValue - 10 < 10000">That's worth talking
+          about!</h2>
+        <h2 v-if="currentBank + totalValue - 10 >= 10000 && currentBank + totalValue - 10 < 100000">You figured
+          something out, didn't you?</h2>
+        <h2 v-if="currentBank + totalValue - 10 >= 100000">WHO'S A GAMER? YOU ARE!</h2>
+        <button class="secondary first" @click="StartOver">Play again?</button>
+        <button @click="gameLoaded = false">Back to home</button>
+        <form action="https://www.paypal.com/donate" method="post" target="_blank">
+          <input type="hidden" name="business" value="ZLBYQH4GJJL7J" />
+          <input type="hidden" name="amount" value="1" />
+          <input type="hidden" name="no_recurring" value="0" />
+          <input type="hidden" name="item_name"
+            value="The purpose of Big Tent Games is to make Ad-free, tracker-free games that are fun to play and platform agnostic. " />
+          <input type="hidden" name="currency_code" value="USD" />
+          <button name="submit" title="PayPal - The safer, easier way to pay online!"
+            alt="Donate with PayPal button">Donate
+            $1.00 w/PayPal</button>
+        </form>
+      </gameover>
+      <settings v-cloak>
+        <navcontrols>
+          <button aria-label="Close" class="close" @click="showSettings = false"></button>
+        </navcontrols>
+        <h1>Settings</h1>
+        <h2>Gameplay</h2>
+        <button :class="{secondary: !changeEveryDay}" @click="ToggleGamePlay"
+          style="margin-bottom: 4px;">{{changeEveryDay ? 'Frenzied' : 'Chill' }}</button>
+        <p v-if="!changeEveryDay">Chill means prices change each day for only a few of the commoddities.</p>
+        <p v-if="changeEveryDay">Frenzied means prices change every day for all of the commoddities.</p>
+        <h2>Music</h2>
+        <button :class="{secondary: !muteAudio}" @click="ToggleMusic"
+          style="margin-bottom: 4px;">{{muteAudio ? 'Off' : 'On' }}</button>
+        <h2>Theme</h2>
+        <button :class="{secondary: useTheLightness}" @click="ChangeGameLuminosity(!useTheLightness)"
+          style="margin-bottom: 10px;">{{useTheLightness ? 'Light' : 'Dark' }}</button>
+        <color v-for="theme in themes" @click="ChangeGameColor(theme)" :class="{selected: theme.isSelected}"
+          :style="{color: theme.textColor, background: 'hsl(' + theme.hue + ', ' + theme.saturation + '%, 50%)'}">
+          {{theme.name}}
+        </color>
+        <h2>Support and feedback </h2>
+        <p>
+          <a onclick="document.location.href='mailto:bigtentgames@me.com?subject=CommOddities!'" href="#">Email Big Tent
+            Games</a>
+        </p>
+        <button @click="Share" style="margin-bottom: 4px;">Share</button>
+        <form action="https://www.paypal.com/donate" method="post" target="_blank">
+          <input type="hidden" name="business" value="ZLBYQH4GJJL7J" />
+          <input type="hidden" name="amount" value="1" />
+          <input type="hidden" name="no_recurring" value="0" />
+          <input type="hidden" name="item_name"
+            value="The purpose of Big Tent Games is to make Ad-free, tracker-free games that are fun to play and platform agnostic. " />
+          <input type="hidden" name="currency_code" value="USD" />
+          <button name="submit" title="PayPal - The safer, easier way to pay online!"
+            alt="Donate with PayPal button">Donate $1.00 w/PayPal</button>
+        </form>
+        <h2>Version</h2>
+        <h3>9.3</h3>
+      </settings>
+      <navbar v-cloak>
+        <button class="tiptimer" :disabled="tippedCommodity != undefined || tipTimer < tipTimerLimit"
+          @click="HandleInsiderTradingCall" :class="{highlighted: tipTimer == 100}"><span>Meet</span>
+          {{tipTimer < tipTimerLimit ? tipTimer + '%' : 'Inside'}}
+          <span>Trader</span></button>
+        <button v-for="page in pages" v-if="page.isShown" @click="SelectThisPage(page)"
+          :class="{isSelected: page.isSelected}">{{page.name}}</button>
+      </navbar>
+      <tutorial>
+        <lesson :style="{marginTop: currentTutorial.position}">
+          <navcontrols>
+            <button aria-label="Close" class="close" @click="EndTutorial"></button>
+          </navcontrols>
+          <h1>{{currentTutorial.title}}</h1>
+          <p>{{currentTutorial.description}}</p>
+          <button @click="AdvanceTutorial">{{currentTutorial.buttonText}}</button>
+        </lesson>
+      </tutorial>
+    </app>
+    <script id="vue-framework" src="helpers/vue.min.js" type='text/javascript'></script>
+    <script src="models/SimpleModels-min.js" type='text/javascript'></script>
+    <script src="models/CommodityObject-min.js" type='text/javascript'></script>
+    <script src="models/ColorObject-min.js" type='text/javascript'></script>
+    <script src="models/TipObject-min.js" type='text/javascript'></script>
+    <script src="models/TutorialObject-min.js" type='text/javascript'></script>
+    <script src="scripts/commodities.js" type='text/javascript'></script>
+  </body>
+
+</html>

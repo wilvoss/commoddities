@@ -1,0 +1,144 @@
+:root {
+  --patina: hsl(var(--hue), var(--saturation), 96%);
+  --appBackgroundColor: hsla(var(--hue), var(--saturation), 96%, 0.5);
+  --appBackground: linear-gradient(white, hsla(var(--hue), var(--saturation), 96%, 0.5) 600px), repeating-linear-gradient(90deg, hsl(var(--hue), var(--saturation), 66%) 0px, hsl(var(--hue), var(--saturation), 66%) 40px, hsl(var(--hue), var(--saturation), 69%) 40px, hsl(var(--hue), var(--saturation), 69%) 80px), hsl(var(--hue), 91%, 66%);
+  --splashBackground: repeating-linear-gradient(90deg, hsl(var(--hue), var(--saturation), 86%) 0px, hsl(var(--hue), var(--saturation), 86%) 40px, hsl(var(--hue), var(--saturation), 89%) 40px, hsl(var(--hue), var(--saturation), 89%) 80px), hsl(var(--hue), 91%, 86%);
+  --appColor: hsl(var(--hue), var(--saturation), 20%);
+  --darkAppColor: hsl(var(--hue), var(--saturation), 35%);
+  --listHeaderBackground: hsla(var(--hue), var(--saturation), 80%, 1);
+  --modalBackground: hsl(var(--hue), var(--saturation), 97%);
+  --listCategoryHeaderBorderColor: hsl(var(--hue), var(--saturation), 36%);
+  --listItemBackground: repeating-linear-gradient(45deg, hsl(var(--hue), var(--saturation), 96%) 0px, hsl(var(--hue), var(--saturation), 96%) 10px, hsl(var(--hue), var(--saturation), 97%) 10px, hsl(var(--hue), var(--saturation), 97%) 20px);
+  --goldBackingFlash: repeating-linear-gradient(90deg, hsl(var(--hue), var(--saturation), 99%) 0px, hsl(var(--hue), var(--saturation), 99%) 10px, hsl(var(--hue), var(--saturation), 97%) 10px, hsl(var(--hue), var(--saturation), 97%) 20px);
+  --listItemBackgroundHover: hsl(var(--hue), var(--saturation), 95%) 0%;
+  --listItemColor: hsl(var(--hue), var(--saturation), 25%);
+  --goldFlashColor: hsla(var(--hue), var(--saturation), 73%, 0.5);
+  --upColor: rgb(0, 177, 0);
+  --downColor: rgb(255, 0, 64);
+  --accentColor: hsl(158, 100%, 50%);
+  --reallyDarkMoneyColor: hsl(158, 100%, 4%);
+}
+
+splash tagline {
+  color: black;
+  text-shadow: none;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+}
+
+h1 {
+  color: black;
+  text-shadow: none;
+}
+
+subhead {
+  color: hsl(var(--hue), var(--saturation), 25%);
+}
+
+bank span {
+  color: white;
+}
+
+notifications {
+  border: 1px solid hsl(var(--notificationsHue), var(--notificationsSaturation), 64%);
+  background: repeating-radial-gradient(circle, hsl(var(--notificationsHue), var(--notificationsSaturation), 40%) 0px, hsl(var(--notificationsHue), var(--notificationsSaturation), 40%) 10px, hsl(var(--notificationsHue), var(--notificationsSaturation), 42%) 10px, hsl(var(--notificationsHue), var(--notificationsSaturation), 42%) 20px);
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.5);
+}
+notifications button {
+  background-color: hsl(var(--notificationsHue), var(--notificationsSaturation), 97%);
+  color: hsl(var(--notificationsHue), var(--notificationsSaturation), 25%);
+}
+
+notifications button.secondary {
+  color: hsl(var(--notificationsHue), var(--notificationsSaturation), 97%);
+  background: none;
+  border: 1px solid;
+}
+
+notifications h3 {
+  color: white;
+}
+
+lesson {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.5);
+}
+
+commodity.unitsOwned {
+  background: white;
+  border-bottom: 1px solid hsl(var(--hue), var(--saturation), 80%);
+}
+
+commodity.categoryHeader {
+  background: linear-gradient(var(--listHeaderBackground), hsla(var(--hue), var(--saturation), 75%, 0) 80%);
+  color: black;
+}
+
+listheader {
+  text-shadow: none;
+}
+
+detail,
+gameover,
+settings,
+howto {
+  box-shadow: 0px 10px 10px rgb(0, 0, 0, 0.5);
+  color: black;
+}
+
+settings button.close,
+howto button.close,
+detail button.close,
+tutorial button.close,
+detail.hasImage button.close {
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+settings color {
+  border: 2px solid white;
+  color: black;
+}
+
+settings color.selected {
+  border-color: black;
+}
+
+listheader .sortedBy {
+  color: black;
+  box-shadow: none;
+}
+
+navbar {
+  background: linear-gradient(hsla(var(--hue), var(--saturation), 60%, 1) 0%, hsla(var(--hue), var(--saturation), 95%, 1) 100%);
+  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.5);
+  border-top: 1px solid black;
+}
+
+navbar button {
+  text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.25);
+}
+
+navbar button.isSelected {
+  color: black;
+}
+
+navbar button.highlighted {
+  text-shadow: 0px 0px 10px rgba(255, 255, 255, 1);
+  background: radial-gradient(white, rgba(255, 255, 255, 0) 75%);
+}
+
+bar.purchased {
+  background: hsla(var(--hue), var(--saturation), 75%, 1);
+}
+
+bar.purchased.sold {
+  background: repeating-linear-gradient(-45deg, hsla(var(--hue), var(--saturation), 75%, 1) 0px, hsla(var(--hue), var(--saturation), 75%, 1) 4px, var(--accentColor) 4px, var(--accentColor) 8px);
+}
+
+commodity bar.purchased.sold {
+  background: repeating-linear-gradient(-45deg, hsla(var(--hue), var(--saturation), 75%, 1) 0px, hsla(var(--hue), var(--saturation), 75%, 1) 2px, var(--accentColor) 2px, var(--accentColor) 4px);
+}
