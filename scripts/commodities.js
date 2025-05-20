@@ -16,6 +16,7 @@ Vue.config.ignoredElements = ['app', 'page', 'navbar', 'settings', 'splash', 'sp
 var app = new Vue({
   el: '#app',
   data: {
+    version: '0.02.01',
     showNotification: false,
     notificationType: [{ serious: 'serious', normal: 'normal', warn: 'warn' }],
     currentNotification: null,
@@ -46,7 +47,8 @@ var app = new Vue({
     gameOver: false,
     gameInterval: null,
     ringleaderinterval: null,
-    gameSpeed: 10000,
+    allSpeeds: [5000, 1000, 500],
+    gameSpeed: 5000,
     giftList: [],
     giftEarned: false,
     tipSpeed: 500,
@@ -139,6 +141,17 @@ var app = new Vue({
           break;
         } else if (x == this.tutorials.length - 1) {
           this.EndTutorial();
+          this.gameLoaded = true;
+        }
+      }
+    },
+
+    RewindTutorial() {
+      for (let x = this.tutorials.length - 1; x >= 0; x--) {
+        const tutorial = this.tutorials[x];
+        if (tutorial == this.currentTutorial && x != 0) {
+          this.currentTutorial = this.tutorials[x - 1];
+          break;
         }
       }
     },
@@ -149,6 +162,7 @@ var app = new Vue({
       tut.position = '-200px';
       this.currentTutorial = tut;
       this.showTutorial = false;
+      this.gameLoaded = false;
     },
 
     Add10ToBank() {
@@ -178,6 +192,7 @@ var app = new Vue({
     HandleQuitGameCall() {
       this.CreateNotification('serious', 'Are you sure you want to quit?', '', 'No', this.CloseNotification, 'Yes', this.EndGame);
       this.ShowNotification();
+      // this.showSettings = false;
     },
 
     HandleInsiderTradingCall() {
@@ -192,22 +207,21 @@ var app = new Vue({
 
     ShowNotification() {
       this.showNotification = true;
-      this.ToggleGamePaused(true);
     },
 
     CloseNotification() {
       this.showNotification = false;
       this.showSEC = false;
-      this.ToggleGamePaused(false);
     },
 
     ToggleGamePaused(value) {
       if (this.timeToEnd != 0) {
         window.clearInterval(this.gameInterval);
+
         if (value == undefined) {
-          this.gamePaused = !this.gamePaused;
+          this.gamePaused = this.showSettings = !this.gamePaused;
         } else {
-          this.gamePaused = value;
+          this.gamePaused = this.showSettings = value;
         }
         if (!this.gamePaused) {
           this.gameInterval = window.setInterval(this.UpdateGame, this.gameSpeed);
@@ -481,7 +495,7 @@ var app = new Vue({
       this.startValue = 0;
       this.commodities = [];
       this.timeToEnd = !UseDebug ? 365 : 365;
-      this.gameSpeed = 10000;
+      this.gameSpeed = this.allSpeeds[0];
       this.selectedCommodity = null;
       this.displayedCommodity = new CommodityObject({});
       this.tipEngaged = false;
@@ -495,6 +509,8 @@ var app = new Vue({
       this.sortByValue = false;
       this.sortByUnitsOwned = false;
       this.sortByReversePrice = false;
+      this.SelectThisPage(this.pages[0]);
+
       this.AssignCommidityData();
       this.GetHighestValueInLastSetForAllComms();
       this.gameInterval = window.setInterval(this.UpdateGame, this.gameSpeed);
@@ -502,12 +518,12 @@ var app = new Vue({
     },
 
     ToggleGameSpeed() {
-      if (this.gameSpeed == 10000) {
-        this.gameSpeed = 5000;
-      } else if (this.gameSpeed == 5000) {
-        this.gameSpeed = 1000;
-      } else if (this.gameSpeed == 1000) {
-        this.gameSpeed = 10000;
+      if (this.gameSpeed === this.allSpeeds[0]) {
+        this.gameSpeed = this.allSpeeds[1];
+      } else if (this.gameSpeed === this.allSpeeds[1]) {
+        this.gameSpeed = this.allSpeeds[2];
+      } else if (this.gameSpeed === this.allSpeeds[2]) {
+        this.gameSpeed = this.allSpeeds[0];
       }
       // this.gameSpeed = this.gameSpeed == 10000 ? 1000 : 10000;
       window.clearInterval(this.gameInterval);
@@ -523,8 +539,8 @@ var app = new Vue({
       }
     },
 
-    ToggleMusic() {
-      this.muteAudio = !this.muteAudio;
+    ToggleMusic(_value) {
+      this.muteAudio = _value;
       localStorage.setItem('muteAudio', this.muteAudio);
       let audio = document.getElementById('themeMusic');
       audio.volume = 0.05;
@@ -536,8 +552,8 @@ var app = new Vue({
       }
     },
 
-    ToggleGamePlay() {
-      this.changeEveryDay = !this.changeEveryDay;
+    ToggleGamePlay(_value) {
+      this.changeEveryDay = _value;
       localStorage.setItem('changeEveryDay', this.changeEveryDay);
     },
 
@@ -591,6 +607,36 @@ var app = new Vue({
         this.r.style.setProperty('--accentColor', this.useTheLightness ? theme.darkAccentColor : theme.accentColor);
       }
       this.currentTheme = theme;
+    },
+
+    NextColor() {
+      let nextTheme = this.themes[0];
+      this.themes.forEach((theme) => {
+        if (theme.isSelected) {
+          nextTheme = theme;
+        }
+      });
+      let index = this.themes.indexOf(nextTheme);
+      index++;
+      if (index >= this.themes.length) {
+        index = 0;
+      }
+      this.ChangeGameColor(this.themes[index]);
+    },
+
+    PreviousColor() {
+      let previousTheme = this.themes[0];
+      this.themes.forEach((theme) => {
+        if (theme.isSelected) {
+          previousTheme = theme;
+        }
+      });
+      let index = this.themes.indexOf(previousTheme);
+      index--;
+      if (index < 0) {
+        index = this.themes.length - 1;
+      }
+      this.ChangeGameColor(this.themes[index]);
     },
 
     ChangeGameLuminosity(light) {
@@ -680,10 +726,57 @@ var app = new Vue({
         this.ToggleMusic();
       }
     },
+
+    HandleMouseDown(event) {
+      if (!this.muteAudio) {
+        this.ToggleMusic(false);
+      }
+    },
+
+    HandleKeyDown(event) {
+      switch (event.key) {
+        case 'Escape':
+          if (!this.gameLoaded && this.showSettings) {
+            this.showSettings = false;
+          } else if (this.showTutorial) {
+            this.EndTutorial();
+          } else if (this.selectedCommodity !== null) {
+            this.selectedCommodity = null;
+          } else if (this.showNotification) {
+            this.showNotification = false;
+          } else if (!this.showSettings && this.gameLoaded && !this.gameOver) {
+            this.showSettings = this.gamePaused = true;
+          } else if (this.showSettings && this.gameLoaded && !this.gameOver) {
+            this.showSettings = this.gamePaused = false;
+          } else if (this.gameLoaded) {
+            this.gameLoaded = false;
+          }
+          break;
+        case 'Enter':
+          break;
+        case ']':
+          this.NextColor();
+          break;
+        case '[':
+          this.PreviousColor();
+          break;
+        case 'ArrowRight':
+          this.AdvanceTutorial();
+          break;
+        case 'ArrowLeft':
+          this.RewindTutorial();
+          break;
+        case '\\':
+          this.ChangeGameLuminosity(!this.useTheLightness);
+          break;
+      }
+    },
   },
 
   mounted() {
     this.RestorePreferences();
+    window.addEventListener('mousedown', this.HandleMouseDown);
+    window.addEventListener('keydown', this.HandleKeyDown);
     this.ringleaderinterval = window.setInterval(this.UpdateTipTimer, this.tipSpeed);
   },
 
@@ -735,6 +828,54 @@ var app = new Vue({
       }
 
       return this.commodities.sort(compare);
+    },
+
+    currentBankText: function () {
+      return this.Currency(this.currentBank);
+    },
+
+    currentSpeed: function () {
+      let speedText = '1x';
+      if (this.gameSpeed !== this.allSpeeds[0]) {
+        speedText = this.gameSpeed === this.allSpeeds[1] ? '5x' : '10x';
+      }
+      return `${speedText} speed`;
+    },
+
+    currentTimeLeft: function () {
+      return `${this.timeToEnd} days`;
+    },
+
+    getLightness: function () {
+      return this.useTheLightness;
+    },
+
+    finalValue: function () {
+      return this.Currency(this.totalValue + this.currentBank);
+    },
+
+    finalTimeMessage: function () {
+      if (!this.imeToEnd === 0) {
+        return 'A year of trading has passed :)';
+      } else if (this.timeToEnd < 0) {
+        return "You ran out of time! You can't buy anything else :(";
+      }
+    },
+
+    finalMessage: function () {
+      if (this.currentBank + this.totalValue - 10 < 0) {
+        return 'Pretty bad, better luck next time!';
+      } else if (this.currentBank + this.totalValue - 10 >= 0 && this.currentBank + this.totalValue - 10 < 100) {
+        return 'Not bad, could be better.';
+      } else if (this.currentBank + totalValue - 10 >= 100 && currentBank + totalValue - 10 < 1000) {
+        return "Pretty good, you're getting the hang of it.";
+      } else if (this.currentBank + this.totalValue - 10 >= 1000 && this.currentBank + this.totalValue - 10 < 10000) {
+        return "That's worth talking about!";
+      } else if (this.currentBank + this.totalValue - 10 >= 10000 && this.currentBank + this.totalValue - 10 < 100000) {
+        return "You figured something out, didn't you?";
+      } else if (this.currentBank + this.totalValue - 10 >= 100000) {
+        return "WHO'S A GAMER? YOU ARE!";
+      }
     },
   },
 });

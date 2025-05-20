@@ -63,17 +63,23 @@
         <source src="" id="themeSource" type="audio/aac">
       </audio>
       <splash :class="{loaded: gameLoaded}" v-cloak>
-        <splashwrap v-cloak>
+        <section>
           <logo @click="window.open('https://bigtentgames.com', '_blank')">
           </logo>
           <h1 v-cloak>CommOddities!</h1>
           <tagline v-cloak>A game of odds.</tagline>
+        </section>
+        <section>
           <p v-cloak><b>Start with {{Currency(startingBank)}} in the bank.</b></p>
           <p v-cloak>How much can you earn in 365 turns?</p>
-          <button @click="StartOver" class="secondary" v-cloak>Play</button>
-          <button @click="showSettings = true; showHowTo = false;" v-cloak>Settings</button>
+        </section>
+        <section>
+          <button @click="StartOver" class="secondary big" v-cloak>Play</button>
           <button @click="StartTutorial" v-cloak>How to play</button>
-        </splashwrap>
+          <button @click="showSettings = true; showHowTo = false;" v-cloak>Settings</button>
+          <!-- <button @click="Share">Share</button> -->
+          <button @click="window.open('https://buymeacoffee.com/wilvoss', '_blank')">Donate!</button>
+        </section>
       </splash>
       <notifications
         :class="{open: showNotification, serious: currentNotification!=null && currentNotification.type == 'serious', warn: currentNotification!=null && currentNotification.type == 'warn'}"
@@ -89,20 +95,15 @@
       </notifications>
       <info v-cloak>
         <bank :class="{added: bankFundsAdded}">
-          <span @click="showSettings = !showSettings">{{Currency(currentBank)}}</span>
-          <p class="settingsButton">
-            <settingsButton>{{this.timeToEnd}} days left</settingsButton>
-          </p>
+          <span>{{currentBankText}}</span>
         </bank>
         <speedControls>
           <button class="pause" @click="ToggleGamePaused(!gamePaused)">
-            <span>{{gamePaused ? '❚❚ Paused' : '▶&#xFE0E; Playing'}} </span>
+            <span>{{currentTimeLeft}} </span>
           </button>
-          <button class="speed"
-            @click="ToggleGameSpeed">{{gameSpeed == 1000 ? '10x speed' : gameSpeed == 10000 ? '1x speed': '5x speed'}}</button>
-          <button v-if="timeToEnd != 0 && !gameOver" class="quit" @click="HandleQuitGameCall">Quit</button>
+          <button class="speed" @click="ToggleGameSpeed">{{currentSpeed}}</button>
         </speedControls>
-        <subhead v-if="timeToEnd != 0 && !gameOver">Current value</subhead>
+        <subhead v-if="timeToEnd != 0 && !gameOver">Net worth</subhead>
         <networth @click="SelectCommodity(event, selectedCommodity); showSettings = false">
           {{gameOver ? 'Game over' : Currency(totalValue)}}
         </networth>
@@ -237,78 +238,84 @@
         <p style="height: 40px;"></p>
       </detail>
       <gameover v-cloak>
-        <p>You now have</p>
-        <h1>{{Currency(totalValue + currentBank)}}!</h1>
-        <p v-if="timeToEnd > 0 ">You can't buy anything else :(</p>
-        <p v-if="timeToEnd == 0 ">A year of trading has passed :)</p>
-        <h2 v-if="currentBank + totalValue - 10 < 0">Pretty bad, better luck next time!</h2>
-        <h2 v-if="currentBank + totalValue - 10 >= 0 && currentBank + totalValue - 10 < 100">Not bad, could be better.
-        </h2>
-        <h2 v-if="currentBank + totalValue - 10 >= 100 && currentBank + totalValue - 10 < 1000">Pretty good, you're
-          getting the hang of it.</h2>
-        <h2 v-if="currentBank + totalValue - 10 >= 1000 && currentBank + totalValue - 10 < 10000">That's worth talking
-          about!</h2>
-        <h2 v-if="currentBank + totalValue - 10 >= 10000 && currentBank + totalValue - 10 < 100000">You figured
-          something out, didn't you?</h2>
-        <h2 v-if="currentBank + totalValue - 10 >= 100000">WHO'S A GAMER? YOU ARE!</h2>
-        <button class="secondary first" @click="StartOver">Play again?</button>
-        <button @click="gameLoaded = false">Back to home</button>
-        <form action="https://www.paypal.com/donate" method="post" target="_blank">
-          <input type="hidden" name="business" value="ZLBYQH4GJJL7J" />
-          <input type="hidden" name="amount" value="1" />
-          <input type="hidden" name="no_recurring" value="0" />
-          <input type="hidden" name="item_name"
-            value="The purpose of Big Tent Games is to make Ad-free, tracker-free games that are fun to play and platform agnostic. " />
-          <input type="hidden" name="currency_code" value="USD" />
-          <button name="submit" title="PayPal - The safer, easier way to pay online!"
-            alt="Donate with PayPal button">Donate
-            $1.00 w/PayPal</button>
-        </form>
+        <section>
+          <p>You finished with</p>
+          <h1>{{finalValue}}!</h1>
+        </section>
+        <section>
+          <p>{{finalTimeMessage}}</p>
+          <h2> {{finalMessage}}</h2>
+        </section>
+        <section>
+          <button class="secondary first" @click="StartOver">Play again?</button>
+          <button @click="gameLoaded = false">Back to home</button>
+          <button @click="window.open('https://buymeacoffee.com/wilvoss', '_blank')">Buy me a coffee!</button>
+        </section>
+
       </gameover>
-      <settings v-cloak>
+      <settings v-cloak :class="{disabled: showNotification}">
         <navcontrols>
-          <button aria-label="Close" class="close" @click="showSettings = false"></button>
+          <button aria-label="Close" class="close" @click="showSettings = gamePaused = false"></button>
         </navcontrols>
-        <h1>Settings</h1>
-        <h2>Gameplay</h2>
-        <button :class="{secondary: !changeEveryDay}" @click="ToggleGamePlay"
-          style="margin-bottom: 4px;">{{changeEveryDay ? 'Frenzied' : 'Chill' }}</button>
-        <p v-if="!changeEveryDay">Chill means prices change each day for only a few of the commoddities.</p>
-        <p v-if="changeEveryDay">Frenzied means prices change every day for all of the commoddities.</p>
-        <h2>Music</h2>
-        <button :class="{secondary: !muteAudio}" @click="ToggleMusic"
-          style="margin-bottom: 4px;">{{muteAudio ? 'Off' : 'On' }}</button>
-        <h2>Theme</h2>
-        <button :class="{secondary: useTheLightness}" @click="ChangeGameLuminosity(!useTheLightness)"
-          style="margin-bottom: 10px;">{{useTheLightness ? 'Light' : 'Dark' }}</button>
-        <color v-for="theme in themes" @click="ChangeGameColor(theme)" :class="{selected: theme.isSelected}"
-          :style="{color: theme.textColor, background: 'hsl(' + theme.hue + ', ' + theme.saturation + '%, 50%)'}">
-          {{theme.name}}
-        </color>
-        <h2>Support and feedback </h2>
-        <p>
-          <a onclick="document.location.href='mailto:bigtentgames@me.com?subject=CommOddities!'" href="#">Email Big Tent
-            Games</a>
-        </p>
-        <button @click="Share" style="margin-bottom: 4px;">Share</button>
-        <form action="https://www.paypal.com/donate" method="post" target="_blank">
-          <input type="hidden" name="business" value="ZLBYQH4GJJL7J" />
-          <input type="hidden" name="amount" value="1" />
-          <input type="hidden" name="no_recurring" value="0" />
-          <input type="hidden" name="item_name"
-            value="The purpose of Big Tent Games is to make Ad-free, tracker-free games that are fun to play and platform agnostic. " />
-          <input type="hidden" name="currency_code" value="USD" />
-          <button name="submit" title="PayPal - The safer, easier way to pay online!"
-            alt="Donate with PayPal button">Donate $1.00 w/PayPal</button>
-        </form>
-        <h2>Version</h2>
-        <h3>9.3</h3>
+        <h1>{{gamePaused ? 'Paused' : 'Settings'}}</h1>
+        <section v-if="gameLoaded">
+          <button class="first quit" @click="HandleQuitGameCall">Quit?</button>
+        </section>
+        <section>
+          <h2>Music</h2>
+          <leftright>
+            <button :class="{secondary: muteAudio, tertiary: !muteAudio}" @click="ToggleMusic(true)"
+              style="margin-bottom: 4px;">Off</button>
+            <button :class="{secondary: !muteAudio, tertiary: muteAudio}" @click="ToggleMusic(false)"
+              style="margin-bottom: 4px;">On</button>
+          </leftright>
+        </section>
+        <section>
+          <h2>Theme</h2>
+          <leftright>
+            <button :class="{secondary: !getLightness, tertiary: getLightness}" @click="ChangeGameLuminosity(false)"
+              style="margin-bottom: 10px;">Dark</button>
+            <button :class="{secondary: getLightness, tertiary: !getLightness}" @click="ChangeGameLuminosity(true)"
+              style="margin-bottom: 10px;">Light</button>
+          </leftright>
+          <colors>
+            <color v-for="theme in themes" @click="ChangeGameColor(theme)" :class="{selected: theme.isSelected}"
+              :style="{color: theme.textColor, background: 'hsl(' + theme.hue + ', ' + theme.saturation + '%, 50%)'}">
+              <!-- {{theme.name}} -->
+            </color>
+          </colors>
+        </section>
+        <section v-if="!gameLoaded">
+          <h2 :class="{disabled: gameLoaded}">Gameplay</h2>
+          <leftright>
+            <button :class="{disabled: gameLoaded, secondary: !changeEveryDay, tertiary: changeEveryDay}"
+              @click="ToggleGamePlay(false)" style="margin-bottom: 4px;">Chill</button>
+            <button :class="{disabled: gameLoaded, secondary: changeEveryDay, tertiary: !changeEveryDay}"
+              @click="ToggleGamePlay(true)" style="margin-bottom: 4px;">Frenzied</button>
+          </leftright>
+          <p :class="{disabled: gameLoaded}" v-if="!changeEveryDay">Prices change a few commooddities at a time.
+          </p>
+          <p :class="{disabled: gameLoaded}" v-if="changeEveryDay">Prices change every day for all commoddities.</p>
+        </section>
+        <section v-if="!gameLoaded">
+          <h2>Feedback</h2>
+          <p> <a onclick="document.location.href='mailto:bigtentgames@me.com?subject=CommOddities!'" href="#">Email Big
+              Tent
+              Games</a>
+          </p>
+        </section>
       </settings>
       <navbar v-cloak>
         <button class="tiptimer" :disabled="tippedCommodity != undefined || tipTimer < tipTimerLimit"
-          @click="HandleInsiderTradingCall" :class="{highlighted: tipTimer == 100}"><span>Meet</span>
+          @click="HandleInsiderTradingCall" :class="{highlighted: tipTimer == 100}">
+          <span>
+            {{tipTimer < tipTimerLimit ? '' : 'Meet'}}
+          </span>
           {{tipTimer < tipTimerLimit ? tipTimer + '%' : 'Inside'}}
-          <span>Trader</span></button>
+          <span>
+            {{tipTimer < tipTimerLimit ? '' : 'Trader'}}
+          </span>
+        </button>
         <button v-for="page in pages" v-if="page.isShown" @click="SelectThisPage(page)"
           :class="{isSelected: page.isSelected}">{{page.name}}</button>
       </navbar>
@@ -318,17 +325,17 @@
             <button aria-label="Close" class="close" @click="EndTutorial"></button>
           </navcontrols>
           <h1>{{currentTutorial.title}}</h1>
-          <p>{{currentTutorial.description}}</p>
+          <p v-html="currentTutorial.description"></p>
           <button @click="AdvanceTutorial">{{currentTutorial.buttonText}}</button>
         </lesson>
       </tutorial>
     </app>
     <script id="vue-framework" src="helpers/vue.min.js" type='text/javascript'></script>
-    <script src="models/SimpleModels-min.js" type='text/javascript'></script>
-    <script src="models/CommodityObject-min.js" type='text/javascript'></script>
-    <script src="models/ColorObject-min.js" type='text/javascript'></script>
-    <script src="models/TipObject-min.js" type='text/javascript'></script>
-    <script src="models/TutorialObject-min.js" type='text/javascript'></script>
+    <script src="models/SimpleModels.min.js" type='text/javascript'></script>
+    <script src="models/CommodityObject.min.js" type='text/javascript'></script>
+    <script src="models/ColorObject.min.js" type='text/javascript'></script>
+    <script src="models/TipObject.min.js" type='text/javascript'></script>
+    <script src="models/TutorialObject.min.js" type='text/javascript'></script>
     <script src="scripts/commodities.js" type='text/javascript'></script>
   </body>
 

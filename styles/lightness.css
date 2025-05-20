@@ -43,26 +43,6 @@ bank span {
   color: white;
 }
 
-notifications {
-  border: 1px solid hsl(var(--notificationsHue), var(--notificationsSaturation), 64%);
-  background: repeating-radial-gradient(circle, hsl(var(--notificationsHue), var(--notificationsSaturation), 40%) 0px, hsl(var(--notificationsHue), var(--notificationsSaturation), 40%) 10px, hsl(var(--notificationsHue), var(--notificationsSaturation), 42%) 10px, hsl(var(--notificationsHue), var(--notificationsSaturation), 42%) 20px);
-  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.5);
-}
-notifications button {
-  background-color: hsl(var(--notificationsHue), var(--notificationsSaturation), 97%);
-  color: hsl(var(--notificationsHue), var(--notificationsSaturation), 25%);
-}
-
-notifications button.secondary {
-  color: hsl(var(--notificationsHue), var(--notificationsSaturation), 97%);
-  background: none;
-  border: 1px solid;
-}
-
-notifications h3 {
-  color: white;
-}
-
 lesson {
   background: rgba(255, 255, 255, 1);
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.5);
@@ -74,8 +54,8 @@ commodity.unitsOwned {
 }
 
 commodity.categoryHeader {
-  background: linear-gradient(var(--listHeaderBackground), hsla(var(--hue), var(--saturation), 75%, 0) 80%);
   color: black;
+  background: linear-gradient(var(--listHeaderBackground), hsla(var(--hue), var(--saturation), 75%, 0) 80%);
 }
 
 listheader {
@@ -86,8 +66,8 @@ detail,
 gameover,
 settings,
 howto {
-  box-shadow: 0px 10px 10px rgb(0, 0, 0, 0.5);
   color: black;
+  box-shadow: 0px 10px 10px rgb(0, 0, 0, 0.5);
 }
 
 settings button.close,
@@ -99,12 +79,13 @@ detail.hasImage button.close {
 }
 
 settings color {
-  border: 2px solid white;
   color: black;
+  border-color: white;
 }
 
 settings color.selected {
   border-color: black;
+  /* box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15); */
 }
 
 listheader .sortedBy {

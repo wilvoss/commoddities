@@ -13,18 +13,6 @@ class ColorObject {
 
 const Themes = [
   new ColorObject({
-    name: 'Emet',
-    hue: 310,
-    saturation: 50,
-    luminosity: 50,
-  }),
-  new ColorObject({
-    name: 'Pia',
-    hue: 240,
-    saturation: 40,
-    luminosity: 50,
-  }),
-  new ColorObject({
     name: 'Wintro',
     hue: 190,
     saturation: 90,
@@ -36,7 +24,7 @@ const Themes = [
     hue: 120,
     saturation: 30,
     luminosity: 50,
-    accentColor: 'hsl(200, 100%, 50%)',
+    accentColor: 'hsl(183, 100%, 50%)',
   }),
   new ColorObject({
     name: 'Sumet',
@@ -52,7 +40,19 @@ const Themes = [
     luminosity: 50,
   }),
   new ColorObject({
-    name: 'HiC',
+    name: 'Emet',
+    hue: 310,
+    saturation: 50,
+    luminosity: 50,
+  }),
+  new ColorObject({
+    name: 'Pia',
+    hue: 240,
+    saturation: 40,
+    luminosity: 50,
+  }),
+  new ColorObject({
+    name: 'Hi-C',
     hue: 310,
     saturation: 0,
     luminosity: 50,
