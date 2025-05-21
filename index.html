@@ -130,8 +130,9 @@
           <goldbacking>
             <!-- <img src="images/big tent logo.svg" alt='' /> -->
             <p>You don't own any oddities!</p>
-            <button class="secondary" @click="sortByPrice = false; sortByValue = false; sortByWatched = false">Show
-              Oddities</button>
+            <button class="secondary" @click="sortByPrice = sortByValue = sortByWatched = false">
+              Show Oddities
+            </button>
           </goldbacking>
         </commodity>
 
@@ -189,9 +190,7 @@
         </pagewrap>
       </page>
       <detail v-cloak v-if="displayedCommodity != null" :class="{hasImage: displayedCommodity.imageUrl != ' '}">
-        <navcontrols>
-          <button aria-label="Close" class="close" @click="SelectCommodity(event, selectedCommodity)"></button>
-        </navcontrols>
+        <button aria-label="Close" class="close" @click="SelectCommodity(event, selectedCommodity)"></button>
         <h1>{{displayedCommodity.name}}</h1>
         <img :src="'images/commodities/' + displayedCommodity.imageUrl" alt=''
           v-if="displayedCommodity != null && displayedCommodity.imageUrl != 'null'" />
@@ -254,9 +253,7 @@
 
       </gameover>
       <settings v-cloak :class="{disabled: showNotification}">
-        <navcontrols>
-          <button aria-label="Close" class="close" @click="showSettings = gamePaused = false"></button>
-        </navcontrols>
+        <button aria-label="Close" class="close" @click="showSettings = gamePaused = false"></button>
         <h1>{{gamePaused ? 'Paused' : 'Settings'}}</h1>
         <section v-if="gameLoaded">
           <button class="first quit" @click="HandleQuitGameCall">Quit?</button>
@@ -321,9 +318,7 @@
       </navbar>
       <tutorial>
         <lesson :style="{marginTop: currentTutorial.position}">
-          <navcontrols>
-            <button aria-label="Close" class="close" @click="EndTutorial"></button>
-          </navcontrols>
+          <button aria-label="Close" class="close" @click="EndTutorial"></button>
           <h1>{{currentTutorial.title}}</h1>
           <p v-html="currentTutorial.description"></p>
           <button @click="AdvanceTutorial">{{currentTutorial.buttonText}}</button>

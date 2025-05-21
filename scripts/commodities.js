@@ -429,7 +429,10 @@ var app = new Vue({
           }
           this.CreateNotification('warn', 'You are in violation of the Oddity code!', "You've been fined half of your stock and half your funds as a result.", "It won't happen again!", this.CloseNotification);
 
-          this.ShowNotification();
+          requestAnimationFrame(() => {
+            this.ShowNotification();
+          });
+
           this.commodities.forEach((com) => {
             com.unitsOwned = Math.floor(com.unitsOwned / 2);
           });
@@ -438,12 +441,16 @@ var app = new Vue({
         if (normalIteration) {
           this.timeToEnd--;
         }
-        this.CheckGiftList();
-        this.TallyCommodityValues();
-        this.GetTotalGamerMarketValue();
-        if (normalIteration) {
-          this.GetHighestValueInLastSetForAllComms();
-        }
+
+        this.$nextTick(() => {
+          this.CheckGiftList();
+          this.TallyCommodityValues();
+          this.GetTotalGamerMarketValue();
+          if (normalIteration) {
+            this.GetHighestValueInLastSetForAllComms();
+          }
+        });
+
         var isEnd = true;
         this.commodities.forEach((com) => {
           if (com.currentPrice.value + 1 < this.totalValue + this.currentBank && com.currentPrice.value != 0) {
@@ -867,7 +874,7 @@ var app = new Vue({
         return 'Pretty bad, better luck next time!';
       } else if (this.currentBank + this.totalValue - 10 >= 0 && this.currentBank + this.totalValue - 10 < 100) {
         return 'Not bad, could be better.';
-      } else if (this.currentBank + totalValue - 10 >= 100 && currentBank + totalValue - 10 < 1000) {
+      } else if (this.currentBank + this.totalValue - 10 >= 100 && this.currentBank + this.totalValue - 10 < 1000) {
         return "Pretty good, you're getting the hang of it.";
       } else if (this.currentBank + this.totalValue - 10 >= 1000 && this.currentBank + this.totalValue - 10 < 10000) {
         return "That's worth talking about!";
