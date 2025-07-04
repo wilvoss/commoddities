@@ -16,7 +16,7 @@ Vue.config.ignoredElements = ['app', 'page', 'navbar', 'settings', 'splash', 'sp
 var app = new Vue({
   el: '#app',
   data: {
-    version: '0.02.04',
+    version: '0.02.05',
     showNotification: false,
     notificationType: [{ serious: 'serious', normal: 'normal', warn: 'warn' }],
     currentNotification: null,
